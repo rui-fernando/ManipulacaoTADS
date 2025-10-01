@@ -118,7 +118,13 @@ public class ListaDuplamenteEncadeadaImpl<T extends Comparable<T>> implements Li
     }
 
     @Override
-    public NodoListaEncadeada<T> remove(T chave) {
+    public NodoListaEncadeada<T> remove(T chave) throws ListaVaziaException {
+    	
+    	if (isEmpty()) {
+    		throw new ListaVaziaException("A lista está vazia. "
+					+ "Não é possível remover elementos.");
+    	}
+    	
         NodoListaDuplamenteEncadeada<T> atual = (NodoListaDuplamenteEncadeada<T>) cabeca.getProximo();
 
         while (atual != cauda) {
@@ -163,18 +169,24 @@ public class ListaDuplamenteEncadeadaImpl<T extends Comparable<T>> implements Li
     	return valores;
     }
 
-    @Override
-    public String imprimeInverso() {
-        StringBuilder sb = new StringBuilder();
-        NodoListaDuplamenteEncadeada<T> atual = cauda.getAnterior();
+	@Override
+	public String imprimeInverso() {
+		return imprimeInversoAux(cabeca.getProximo());
+	}
 
-        while (atual != cabeca) {
-            sb.append(atual.getChave()).append(" ");
-            atual = atual.getAnterior();
-        }
+	private String imprimeInversoAux(NodoListaEncadeada<T> no) {
+		
+		if (no == null || no.equals(cauda)) {
+			return "";
+		}
+		String resto = imprimeInversoAux(no.getProximo());
+		
+		if (no.getChave() == null) {
+			return resto;
+		}
+	    return resto.isEmpty() ? no.getChave().toString() : resto + ", " + no.getChave();
 
-        return sb.toString().trim();
-    }
+	}
 
     @Override
     public NodoListaEncadeada<T> sucessor(T chave) {
@@ -207,7 +219,8 @@ public class ListaDuplamenteEncadeadaImpl<T extends Comparable<T>> implements Li
         Conversor<T> conversor = new Conversor<>();
         T[] array = conversor.gerarArray(clazz, tamanho);
 
-        NodoListaDuplamenteEncadeada<T> atual = (NodoListaDuplamenteEncadeada<T>) cabeca.getProximo();
+        NodoListaDuplamenteEncadeada<T> atual = 
+        		(NodoListaDuplamenteEncadeada<T>) cabeca.getProximo();
         int index = 0;
 
         while (atual != cauda) {
